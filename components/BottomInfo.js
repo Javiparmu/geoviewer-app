@@ -1,83 +1,48 @@
-import { ActivityIndicator, PixelRatio, StyleSheet, Button, Text, View, Dimensions, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { useTheme } from '@react-navigation/native'
-import { Ionicons } from '@expo/vector-icons'
-import { FontAwesome5 } from '@expo/vector-icons'
-import { MaterialIcons } from '@expo/vector-icons'
-import { Divider } from 'react-native-elements'
-import { ButtonGroup } from 'react-native-elements'
+import { ActivityIndicator, StyleSheet, Text, View, Dimensions, TouchableOpacity, LayoutAnimation, NativeModules } from 'react-native'
+import { useEffect, useState } from 'react'
+import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons'
+import { Button, ButtonGroup, Divider } from 'react-native-elements'
+import { BottomInfoAnimations } from '../resources'
+import { useBottomInfoStyles } from '../hooks/stylehooks/useBottomInfoStyles'
+import { getArrivalTime, getColors, getRightTime } from '../helpers'
 
-const BottomInfo = ({ selectedMarker, showRoute, setShowRoute, pathToStationData, isVisible, setIsVisible, setSelectedTravelMode }) => {
+const iconSize = 30
+
+export const BottomInfo = ({
+    selectedMarker,
+    showRoute,
+    setShowRoute,
+    pathToStationData,
+    setPathToStationData,
+    isVisible,
+    setIsVisible,
+    setSelectedTravelMode,
+    mapRef
+}) => {
     const [arrivalTime, setArrivalTime] = useState(null)
     const [selectedIndex, setSelectedIndex] = useState(0)
-    const [closed, setClosed] = useState(false)
+    const [closed, setClosed] = useState(true)
+    const [bottomInfoYPosition, setBottomInfoYPosition] = useState(-Dimensions.get('window').width * 0.5)
 
-    const { colors } = useTheme()
+    useEffect(() => {
+        const arrivalPathTime = getArrivalTime(pathToStationData)
+        setArrivalTime(arrivalPathTime)
+    }, [showRoute, pathToStationData])
 
-    const iconSize = 30
+    useEffect(() => {
+        if (isVisible) setClosed(false)
+    }, [isVisible])
 
-    const styles = StyleSheet.create({
-        infovisible: {
-            backgroundColor: colors.card,
-            width: '100%',
-            height: showRoute ? PixelRatio.get() * 55 : PixelRatio.get() * 45,
-            borderTopLeftRadius: 15,
-            borderTopRightRadius: 15,
-            paddingLeft: 20,
-            justifyContent: 'center',
-            flexDirection: 'column',
-            position: 'absolute',
-            bottom: isVisible ? 0 : showRoute ? -PixelRatio.get() * 45 : -PixelRatio.get() * 35,
-            shadowOffset: { width: -2, height: -2 },
-            shadowColor: '#171717',
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-        },
-        closebutton: {
-            display: isVisible ? 'block' : 'none',
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            zIndex: 100,
-            margin: 10,
-            backgroundColor: '#EEEEEE',
-            borderRadius: 30,
-        },
-        hidebutton: {
-            color: colors.text,
-        },
-        driveselectoricons: {
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginVertical: 10,
-            paddingHorizontal: 5,
-            borderColor: 'transparent',
-            backgroundColor: 'transparent',
-            color: 'transparent',
-            width: 280,
-            height: 50,
-            paddingVertical: 5,
-            marginLeft: Dimensions.get('window').width / 2 - 140,
-        },
-        driveselectoricon: {
-            backgroundColor: '#ECECEA',
-            width: iconSize + 35,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingVertical: 1,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: 'transparent',
-        },
-        driveiconshadow: {
-            shadowOffset: { width: -2, height: -2 },
-            shadowColor: '#171717',
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-        }
-    })
+    useEffect(() => {
+        const position = BottomInfoAnimations(closed, isVisible, showRoute)
+        setBottomInfoYPosition(position)
+    }, [isVisible, showRoute, closed])
 
-    const carComponent = () => <FontAwesome5 name="car-alt" size={24} color={selectedIndex === 0 ? colors.text : '#999999'}/>
+    const colors = getColors()
+    const bottomStyles = useBottomInfoStyles(colors, isVisible, showRoute)
+    const styles = StyleSheet.create(bottomStyles)
+
+    const carComponent = () => <FontAwesome5 name="car-alt" size={24} color={selectedIndex === 0 ? colors.text : '#999999'} />
     const walkComponent = () => <FontAwesome5 name="walking" size={iconSize - 5} color={selectedIndex === 1 ? colors.text : '#999999'} />
     const bikeComponent = () => <MaterialIcons name="pedal-bike" size={iconSize} color={selectedIndex === 2 ? colors.text : '#999999'} />
 
@@ -87,73 +52,43 @@ const BottomInfo = ({ selectedMarker, showRoute, setShowRoute, pathToStationData
         { element: bikeComponent },
     ]
 
-    useEffect(() => {
-        let time = new Date()
-        if (pathToStationData) {
-            let hours = Math.floor(pathToStationData?.duration / 60)
-            let minutes = (pathToStationData?.duration.toFixed(2) % 60).toFixed(0)
-            if (time.getMinutes() + minutes > 60) {
-                hours++
-                minutes = (Number(time.getMinutes()) + Number(minutes)) - 60
-                time.setMinutes(0)
-            }
-            if (time.getHours() + hours > 24) {
-                hours = time.getHours() + hours - 24
-            }
-
-            let arrivalPathTime = new Date()
-            arrivalPathTime.setHours(time.getHours() + hours)
-            arrivalPathTime.setMinutes(time.getMinutes() + minutes)
-            setArrivalTime(arrivalPathTime)
-        }
-    }, [showRoute, pathToStationData])
-
-    useEffect(() => {
-        if (isVisible) setClosed(false)
-    }, [isVisible])
-
-    const getRightTime = (time1, time2, type) => {
-        if (time1 < 10) {
-            time1 = '0' + time1
-        }
-        if (time2 < 10) {
-            time2 = '0' + time2
-        }
-        if (type === 0) {
-            return time1 + ':' + time2
-        }
-        else if (type === 1) {
-            return time1
-        }
-        else return 'Unvalid type'
-    }
-
     const handleClose = () => {
         setIsVisible(false)
         setClosed(true)
+        setShowRoute(false)
+        setPathToStationData(null)
+        mapRef.current.animateToRegion({
+            latitude: selectedMarker?.position[0],
+            longitude: selectedMarker?.position[1],
+            latitudeDelta: 0.02, longitudeDelta: 0.02
+        }, 500)
     }
 
     return (
         <>
             {
-                selectedMarker && !closed &&
-                <View style={styles.infovisible} >
+                <View style={[styles.infovisible, { bottom: bottomInfoYPosition }]} >
                     <TouchableOpacity onPress={handleClose} style={styles.closebutton}>
-                        <Ionicons name="ios-close" size={iconSize-10} color='#777777' />
+                        <Ionicons name="ios-close" size={iconSize - 10} color={colors.text} />
                     </TouchableOpacity>
                     <View style={{ marginBottom: 10, marginTop: -5 }}>
-                        <Button title='^' onPress={() => setIsVisible(!isVisible)} style={styles.hidebutton} />
+                        <Button title='^' onPress={() => setIsVisible(prev => !prev)} type="clear" />
                     </View>
                     {
                         !showRoute &&
                         <View>
                             <View style={{ marginTop: -25, marginBottom: 15 }}>
-                                <Text style={{ fontWeight: 'bold', fontSize: 22, color: isVisible ? colors.text : 'transparent' }}>{selectedMarker.name}</Text>
-                                <Text style={{ fontSize: 18, color: isVisible ? colors.text : 'transparent' }}>Estación de Tranvía</Text>
+                                <Text style={{ fontWeight: 'bold', fontSize: 22, color: isVisible ? colors.text : 'transparent' }}>{selectedMarker?.name}</Text>
+                                <Text style={{ fontSize: 18, color: isVisible ? colors.text : 'transparent', marginTop: 4 }}>{selectedMarker?.bikeAmount >= 0
+                                    ? selectedMarker.bikeAmount === 1
+                                        ? 'Queda 1 bicicleta'
+                                        : 'Quedan ' + selectedMarker.bikeAmount + ' bicicletas'
+                                    : 'Estación de Tranvía'}
+                                </Text>
                             </View>
                             <Divider />
                             <View style={{ marginBottom: 10, marginTop: 5 }} >
-                                <Button title='Ver ruta' onPress={() => setShowRoute(true)} />
+                                <Button title='Ver ruta' type="clear" onPress={() => setShowRoute(true)} />
                             </View>
                         </View>
                     }
@@ -187,9 +122,9 @@ const BottomInfo = ({ selectedMarker, showRoute, setShowRoute, pathToStationData
                                             containerStyle={styles.driveselectoricons}
                                             buttonStyle={styles.driveselectoricon}
                                             selectedButtonStyle={{
-                                                backgroundColor: colors.card,
+                                                backgroundColor: colors.buttonEnabledBackground,
                                                 shadowOffset: { width: 0, height: 0 },
-                                                shadowColor: '#000',
+                                                shadowColor: colors.shadow,
                                                 shadowOpacity: 0.15,
                                                 shadowRadius: 3,
                                             }}
@@ -205,5 +140,3 @@ const BottomInfo = ({ selectedMarker, showRoute, setShowRoute, pathToStationData
         </>
     )
 }
-
-export default BottomInfo

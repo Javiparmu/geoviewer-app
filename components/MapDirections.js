@@ -1,12 +1,10 @@
-import { StyleSheet, View } from 'react-native'
-import React from 'react'
 import MapViewDirections from 'react-native-maps-directions'
 import { GOOGLE_MAPS_APIKEY } from '@env'
+import { getColors } from '../helpers'
 import { useTheme } from '@react-navigation/native'
 
-const MapDirections = ({ location, showRoute, setPathToStationData, selectedMarker, selectedTravelMode }) => {
-    const { colors } = useTheme()
-
+export const MapDirections = ({ location, showRoute, setPathToStationData, selectedMarker, selectedTravelMode }) => {
+    const colors = getColors()
     return (
         <>
             {
@@ -33,7 +31,3 @@ const MapDirections = ({ location, showRoute, setPathToStationData, selectedMark
         </>
     )
 }
-
-export default MapDirections
-
-const styles = StyleSheet.create({})

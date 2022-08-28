@@ -1,61 +1,23 @@
-import { PixelRatio, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import { Callout, Marker } from 'react-native-maps'
-import { tramStations } from '../resources/tramStations.js'
-import markersData from '../resources/markersData.json'
+import { muybicis, tramStations, markersData } from '../resources'
 import { MaterialIcons } from '@expo/vector-icons'
-import { FontAwesome5 } from '@expo/vector-icons'
-import { getDistance } from 'geolib'
-import { useTheme } from '@react-navigation/native'
+import { getClosestStation, getColors, getDistanceToStationMessage, getDistanceToUserMessage } from '../helpers'
+import { useMakersStyles } from '../hooks/stylehooks/useMarkersStyles'
 
-const Markers = ({ location, placedMarkerPosition, markerSize, selectedIndexes, setSelectedMarker, setShowRoute, setIsVisible, setPathToStationData }) => {
-    const { colors } = useTheme()
-
-    const styles = StyleSheet.create({
-        customcallout: {
-            width: PixelRatio.get() * 90,
-            backgroundColor: colors.card,
-            margin: -30,
-            padding: 30
-        },
-        staticcustomcallout: {
-            width: 205,
-            backgroundColor: colors.card,
-            margin: -30,
-            padding: 30
-        },
-    })
-
-    const getDistanceToUserMessage = (origin, destination) => {
-        const distanceMsg = origin?.coords
-            ? getDistance(origin?.coords, { latitude: destination[0], longitude: destination[1] }) <= 1000
-                ? 'Distancia a tu posición: ' + getDistance(origin?.coords, { latitude: destination[0], longitude: destination[1] }) + ' metros'
-                : 'Distancia a tu posición: ' + getDistance(origin?.coords, { latitude: destination[0], longitude: destination[1] }) / 1000 + ' kms'
-            : 'Distancia a tu posición: No disponible'
-        return distanceMsg
-    }
-
-    const getDistanceToStationMessage = (origin, destination, stationName) => {
-        const distanceMsg = origin
-            ? getDistance(origin, { latitude: destination[0], longitude: destination[1] }) <= 1000
-                ? 'Estación más cercana: ' + stationName + ' a ' + getDistance(origin, { latitude: destination[0], longitude: destination[1] }) + ' metros'
-                : 'Estación más cercana: ' + stationName + ' a ' + getDistance(origin, { latitude: destination[0], longitude: destination[1] }) / 1000 + ' kms'
-            : 'Estación más cercana: No disponible'
-        return distanceMsg
-    }
-
-    const getClosestStation = (placedMarkerPosition) => {
-        let shortestDistance = 9999999
-        let closestStation = null
-        tramStations.map(station => {
-            const distance = getDistance(placedMarkerPosition, { latitude: station.position[0], longitude: station.position[1] })
-            if (distance < shortestDistance) {
-                shortestDistance = distance
-                closestStation = station
-            }
-        })
-        return closestStation
-    }
+export const Markers = ({ location,
+    placedMarkerPosition,
+    markerSize,
+    selectedIndexes,
+    setSelectedMarker,
+    setShowRoute,
+    setIsVisible,
+    setPathToStationData,
+    mapType
+}) => {
+    const colors = getColors()
+    const markersStyles = useMakersStyles(colors)
+    const styles = StyleSheet.create(markersStyles)
 
     return (
         <>
@@ -68,12 +30,12 @@ const Markers = ({ location, placedMarkerPosition, markerSize, selectedIndexes, 
                         latitude: placedMarkerPosition.latitude,
                         longitude: placedMarkerPosition.longitude
                     }}
-                    title="Tu posición"
+                    title="Posición marcada"
                     pinColor={colors.primary}
                 >
-                    <Callout>
-                        <View style={styles.customcallout}>
-                            <Text style={{ fontSize: 16, color: colors.text, fontWeight: '500' }}>Tu posición</Text>
+                    <Callout tooltip={mapType === '1' ? false : true} style={mapType === '1' ? '' : styles.custommarkercallout}>
+                        <View style={mapType === '1' ? styles.customcalloutios : ''}>
+                            <Text style={{ fontSize: 16, color: colors.text, fontWeight: '500' }}>Posición marcada</Text>
                             <Text style={{ fontSize: 12, color: colors.text }}>{getDistanceToUserMessage(location, [placedMarkerPosition.latitude, placedMarkerPosition.longitude])}</Text>
                             <Text style={{ fontSize: 12, color: colors.text }}>{getDistanceToStationMessage(placedMarkerPosition, getClosestStation(placedMarkerPosition).position, getClosestStation(placedMarkerPosition).name)}</Text>
                         </View>
@@ -103,8 +65,8 @@ const Markers = ({ location, placedMarkerPosition, markerSize, selectedIndexes, 
                                 size={markerSize}
                                 color="#32e482"
                             />
-                            <Callout>
-                                <View style={styles.staticcustomcallout}>
+                            <Callout tooltip={mapType === '1' ? false : true} style={mapType === '1' ? '' : styles.staticcustomcalloutgmaps}>
+                                <View style={mapType === '1' ? styles.staticcustomcalloutios : ''}>
                                     <Text style={{ fontSize: 16, color: colors.text, fontWeight: '500' }}>Estación de tranvía</Text>
                                     <Text style={{ fontSize: 12, color: colors.text }}>{station.name}</Text>
                                 </View>
@@ -114,31 +76,8 @@ const Markers = ({ location, placedMarkerPosition, markerSize, selectedIndexes, 
                 })
             }
             {
-                <Marker
-                    identifier='tram2'
-                    coordinate={{
-                        latitude: 37.2436246,
-                        longitude: -2.2646,
-                    }}
-                    title={'Estación de Tranvía'}
-                    description='eheh'
-                >
-                    <MaterialIcons
-                        name="tram"
-                        size={markerSize}
-                        color="#32e482"
-                    />
-                    <Callout>
-                        <View style={styles.staticcustomcallout}>
-                            <Text style={{ fontSize: 16, color: colors.text, fontWeight: '500' }}>Estación de tranvía</Text>
-                            <Text style={{ fontSize: 12, color: colors.text }}>reher</Text>
-                        </View>
-                    </Callout>
-                </Marker>
-            }
-            {
                 selectedIndexes.includes(0) &&
-                markersData.markers.filter(marker => marker.type === 'Tram').map((marker, index) => {
+                markersData.filter(marker => marker.type === 'Tram').map((marker, index) => {
                     return (
                         <Marker
                             key={index}
@@ -154,8 +93,8 @@ const Markers = ({ location, placedMarkerPosition, markerSize, selectedIndexes, 
                                 size={markerSize}
                                 color="#f56a4d"
                             />
-                            <Callout>
-                                <View style={styles.customcallout}>
+                            <Callout tooltip={mapType === '1' ? false : true} style={mapType === '1' ? '' : styles.customcalloutgmaps}>
+                                <View style={mapType === '1' ? styles.customcalloutios : ''}>
                                     <Text style={{ fontSize: 16, color: colors.text, fontWeight: '500' }}>Tranvía</Text>
                                     <Text style={{ fontSize: 12, color: colors.text }}>{getDistanceToUserMessage(location, marker.position)}</Text>
                                 </View>
@@ -166,7 +105,7 @@ const Markers = ({ location, placedMarkerPosition, markerSize, selectedIndexes, 
             }
             {
                 selectedIndexes.includes(1) &&
-                markersData.markers.filter(marker => marker.type === 'Crosswalk').map((marker, index) => {
+                markersData.filter(marker => marker.type === 'Crosswalk').map((marker, index) => {
                     return (
                         <Marker
                             key={index}
@@ -182,8 +121,8 @@ const Markers = ({ location, placedMarkerPosition, markerSize, selectedIndexes, 
                                 size={markerSize}
                                 color="#8cbbf1"
                             />
-                            <Callout>
-                                <View style={styles.customcallout}>
+                            <Callout tooltip={mapType === '1' ? false : true} style={mapType === '1' ? '' : styles.customcalloutgmaps} >
+                                <View style={mapType === '1' ? styles.customcalloutios : ''}>
                                     <Text style={{ fontSize: 16, color: colors.text, fontWeight: '500' }}>Paso de peatones</Text>
                                     <Text style={{ fontSize: 12, color: colors.text }}>{getDistanceToUserMessage(location, marker.position)}</Text>
                                 </View>
@@ -194,27 +133,33 @@ const Markers = ({ location, placedMarkerPosition, markerSize, selectedIndexes, 
             }
             {
                 selectedIndexes.includes(2) &&
-                markersData.markers.filter(marker => marker.type === 'Bike').map((marker, index) => {
+                muybicis.map((bike, index) => {
                     return (
                         <Marker
                             key={index}
                             coordinate={{
-                                latitude: marker.position[0],
-                                longitude: marker.position[1],
+                                latitude: bike.position[0],
+                                longitude: bike.position[1],
                             }}
                             title='MUyBICI'
                             pinColor='#3163c6'
+                            onPress={() => {
+                                setSelectedMarker(bike)
+                                setIsVisible(true)
+                                setShowRoute(false)
+                                setPathToStationData(null)
+                            }}
                         >
                             <MaterialIcons
                                 name="pedal-bike"
-                                size={markerSize}
-                                color="#f3954f"
+                                size={markerSize - 5}
+                                color={bike.bikeAmount === 0 ? 'gray' : "#f3954f"}
                             />
-                            <Callout>
-                                <View style={styles.customcallout}>
-                                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: '500' }}>MUyBICI</Text>
-                                    <Text style={{ fontSize: 12, color: colors.text }}>{getDistanceToUserMessage(location, marker.position)}</Text>
-                                    <Text style={{ fontSize: 12, color: colors.text }}>{'Quedan ' + marker.bikeAmount + ' bicicletas'}</Text>
+                            <Callout tooltip={mapType === '1' ? false : true} style={mapType === '1' ? '' : styles.customcalloutgmaps} >
+                                <View style={mapType === '1' ? styles.customcalloutios : ''}>
+                                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: '500' }}>{bike.name}</Text>
+                                    <Text style={{ fontSize: 12, color: colors.text }}>{bike.bikeAmount === 1 ? 'Queda 1 bicicleta.' : 'Quedan ' + bike.bikeAmount + ' bicicletas.'}</Text>
+                                    <Text style={{ fontSize: 12, color: colors.text }}>{getDistanceToUserMessage(location, bike.position)}</Text>
                                 </View>
                             </Callout>
                         </Marker>
@@ -224,5 +169,3 @@ const Markers = ({ location, placedMarkerPosition, markerSize, selectedIndexes, 
         </>
     )
 }
-
-export default Markers

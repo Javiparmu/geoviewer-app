@@ -1,37 +1,36 @@
-{
-    "markers":[
+export const markersData = [
         {
             "type": "Tram",
             "position": [
-                37.99239, 
+                37.99239,
                 -1.13160
             ]
         },
         {
             "type": "Tram",
             "position": [
-                37.99469, 
+                37.99469,
                 -1.13020
             ]
         },
         {
             "type": "Crosswalk",
             "position": [
-                37.99216, 
+                37.99216,
                 -1.13040
             ]
         },
         {
             "type": "Crosswalk",
             "position": [
-                37.99016, 
+                37.99016,
                 -1.13270
             ]
         },
         {
             "type": "Bike",
             "position": [
-                37.99016, 
+                37.99016,
                 -1.13040
             ],
             "bikeAmount": 2
@@ -39,7 +38,7 @@
         {
             "type": "Bike",
             "position": [
-                37.99016, 
+                37.99016,
                 -1.13440
             ],
             "bikeAmount": 5
@@ -47,10 +46,9 @@
         {
             "type": "Bike",
             "position": [
-                37.99516, 
+                37.99516,
                 -1.13040
             ],
             "bikeAmount": 3
         }
     ]
-}
