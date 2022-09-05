@@ -4,7 +4,7 @@ Se trata de una App creada con React Native para visualizar en tiempo real datos
 la posición de las estaciones de MUyBICI junto al número de bicicletas que quedan o las estaciones meteorológicas (en proceso). Este proyecto se ha realizado en
 colaboración con el CEUS y el proyecto de Smart Murcia, quienes me han proporcionado los datos para mostrarlos en la aplicación.
 
-![alt 1](https://res.cloudinary.com/journal-udemy-app/image/upload/v1662417293/geoviewer/tcivq5yj5sksbftfsh1g.jpg?w=300)
+![alt 1](https://res.cloudinary.com/journal-udemy-app/image/upload/c_scale,w_300/v1662417293/geoviewer/tcivq5yj5sksbftfsh1g.jpg)
 ![alt 2](https://res.cloudinary.com/journal-udemy-app/image/upload/v1662417292/geoviewer/jhcyksqt9od9ykracf0n.jpg)
 ![alt 3](https://res.cloudinary.com/journal-udemy-app/image/upload/v1662417289/geoviewer/marfwfskrcbcsluryhks.jpg)
 ![alt 4](https://res.cloudinary.com/journal-udemy-app/image/upload/v1662417288/geoviewer/eu8jbkeqi4czit5lysn2.jpg)
