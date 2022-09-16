@@ -1,10 +1,10 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { useEffect, useState } from 'react'
 import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import { ButtonGroup } from 'react-native-elements'
 import { TopMenuAnimations } from '../resources'
-import { useTopMenuStyles } from '../hooks/stylehooks/useTopMenuStyles'
 import { getColors } from '../helpers'
+import { topMenuStyles } from '../themes'
 
 const iconSize = 30
 
@@ -18,8 +18,7 @@ export const TopMenu = ({ selectedIndexes, setSelectedIndexes }) => {
     }, [isVisible])
 
     const colors = getColors()
-    const topStyles = useTopMenuStyles(colors, isVisible)
-    const styles = StyleSheet.create(topStyles)
+    const styles = topMenuStyles(colors, isVisible)
 
     const tramComponent = () => <MaterialIcons name="tram" size={iconSize} color={selectedIndexes.includes(0) ? colors.text : colors.iconDisabled} />
     const crosswalkComponent = () => <MaterialIcons name="directions-walk" size={iconSize - 3} color={selectedIndexes.includes(1) ? colors.text : colors.iconDisabled} />

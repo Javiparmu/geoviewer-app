@@ -1,25 +1,31 @@
-import { Dimensions, NativeModules, Platform, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, Platform, Text, View } from 'react-native'
 import { useEffect, useState } from 'react'
 import { Divider, Switch } from 'react-native-elements'
 import { SliderSettings } from './SliderSettings'
 import { Dropdown } from 'react-native-element-dropdown'
 import { Ionicons } from '@expo/vector-icons'
 import { SideMenuAnimations } from '../resources'
-import { useSideMenuStyles } from '../hooks/stylehooks/useSideMenuStyles'
 import { getColors } from '../helpers'
+import { sideMenuStyles } from '../themes'
+import { useDispatch, useSelector } from 'react-redux'
+import { setSlidersValues } from '../store'
+import { setMapType, setSliderValues } from '../store/geoviewer/sideMenuSlice'
 
 const dropDownData = [
   { value: '1', label: 'Ios Maps (MapKit)' },
   { value: '2', label: 'Google Maps' },
 ]
 
-export const SideMenu = ({ isOpen, slidersValues, setSlidersValues, value, setValue }) => {
+export const SideMenu = () => {
+
   const [isFocus, setIsFocus] = useState(false)
   const [sideMenuXPosition, setSideMenuXPosition] = useState(-Dimensions.get('window').width)
 
+  const dispatch = useDispatch()
+  const { isOpen, sliderValues, mapType } = useSelector(state => state.sideMenu)
+
   const colors = getColors()
-  const sideMenuStyles = useSideMenuStyles(colors)
-  const styles = StyleSheet.create(sideMenuStyles)
+  const styles = sideMenuStyles(colors)
 
   useEffect(() => {
     const position = SideMenuAnimations(isOpen)
@@ -35,7 +41,7 @@ export const SideMenu = ({ isOpen, slidersValues, setSlidersValues, value, setVa
             <Text style={{ color: colors.text, marginRight: 10, fontSize: 16 }}>Mapa:</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Dropdown
-                style={[styles.dropdown, isFocus && { borderColor: '#2089DC' }]}
+                style={[ styles.dropdown, isFocus && { borderColor: '#2089DC' }]}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 iconStyle={styles.iconStyle}
@@ -44,11 +50,11 @@ export const SideMenu = ({ isOpen, slidersValues, setSlidersValues, value, setVa
                 labelField="label"
                 valueField="value"
                 placeholder={!isFocus ? dropDownData[0].label : '...'}
-                value={value}
+                value={mapType}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 onChange={item => {
-                  setValue(item.value);
+                  dispatch(setMapType(item.value));
                   setIsFocus(false);
                 }}
                 renderLeftIcon={() => (
@@ -64,7 +70,7 @@ export const SideMenu = ({ isOpen, slidersValues, setSlidersValues, value, setVa
           </View>
         }
         {
-          (value === '2' || Platform.OS === 'android') ?
+          (mapType === '2' || Platform.OS === 'android') ?
             <>
               {Platform.OS === 'ios' && <Divider />}
               <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 6 }}>
@@ -72,8 +78,6 @@ export const SideMenu = ({ isOpen, slidersValues, setSlidersValues, value, setVa
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <SliderSettings
                     maxValue={3}
-                    value={slidersValues}
-                    setValue={setSlidersValues}
                     type='landmarks'
                     sliderPos={0}
                   />
@@ -85,8 +89,6 @@ export const SideMenu = ({ isOpen, slidersValues, setSlidersValues, value, setVa
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <SliderSettings
                     maxValue={3}
-                    value={slidersValues}
-                    setValue={setSlidersValues}
                     type="roads"
                     sliderPos={1}
                   />
@@ -98,8 +100,6 @@ export const SideMenu = ({ isOpen, slidersValues, setSlidersValues, value, setVa
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <SliderSettings
                     maxValue={3}
-                    value={slidersValues}
-                    setValue={setSlidersValues}
                     type='labels'
                     sliderPos={2}
                   />
@@ -110,12 +110,10 @@ export const SideMenu = ({ isOpen, slidersValues, setSlidersValues, value, setVa
                 <Text style={{ color: colors.text, marginRight: 10, fontSize: 16 }}>Tráfico: </Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Switch
-                    value={slidersValues[3]}
-                    onValueChange={(value) => setSlidersValues((prev) => {
-                      const newValue = [...prev]
-                      newValue[3] = value
-                      return newValue
-                    })}
+                    value={sliderValues[3]}
+                    onValueChange={(value) => dispatch(setSliderValues(
+                      [...sliderValues.slice(0, 3), value]
+                    ))}
                     style={{ transform: [{ scaleX: .9 }, { scaleY: .9 }] }}
                   />
                 </View>

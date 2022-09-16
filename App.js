@@ -1,9 +1,11 @@
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StyleSheet } from 'react-native'
-import { HomeScreen } from './screens/HomeScreen'
+import { HomeScreen } from './src/screens/HomeScreen'
 import { useState } from 'react'
-import { ThemeContext } from './contexts/themeContext.js'
+import { ThemeContext } from './src/contexts/themeContext.js'
+import { store } from './src/store'
+import { Provider } from 'react-redux'
 
 const Stack = createNativeStackNavigator()
 
@@ -50,11 +52,13 @@ export default function App() {
 
   return (
     <ThemeContext.Provider value={themeData}>
-      <NavigationContainer theme={theme == 'Light' ? lightTheme : darkTheme}>
-        <Stack.Navigator screenOptions={globalScreenOptions}>
-          <Stack.Screen name='Home' component={HomeScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <Provider store={store}>
+        <NavigationContainer theme={theme == 'Light' ? lightTheme : darkTheme}>
+          <Stack.Navigator screenOptions={globalScreenOptions}>
+            <Stack.Screen name='Home' component={HomeScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Provider>
     </ThemeContext.Provider>
   );
 }

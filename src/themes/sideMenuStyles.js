@@ -1,7 +1,8 @@
-import { Dimensions } from "react-native"
+import { Dimensions, StyleSheet } from "react-native"
 
-export const useSideMenuStyles = (colors) => {
-    return {
+export const sideMenuStyles = (colors) => {
+
+    return StyleSheet.create({
         menu: {
             backgroundColor: colors.card,
             borderRadius: 20,
@@ -40,5 +41,5 @@ export const useSideMenuStyles = (colors) => {
             width: 20,
             height: 20,
         },
-    }
+    })
 }

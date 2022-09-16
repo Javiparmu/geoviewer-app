@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { Callout, Marker } from 'react-native-maps'
 import { muybicis, tramStations, markersData } from '../resources'
 import { MaterialIcons } from '@expo/vector-icons'
 import { getClosestStation, getColors, getDistanceToStationMessage, getDistanceToUserMessage } from '../helpers'
-import { useMakersStyles } from '../hooks/stylehooks/useMarkersStyles'
+import { markersStyles } from '../themes'
 
 export const Markers = ({ location,
     placedMarkerPosition,
@@ -15,9 +15,9 @@ export const Markers = ({ location,
     setPathToStationData,
     mapType
 }) => {
+
     const colors = getColors()
-    const markersStyles = useMakersStyles(colors)
-    const styles = StyleSheet.create(markersStyles)
+    const styles = markersStyles(colors)
 
     return (
         <>
@@ -65,7 +65,7 @@ export const Markers = ({ location,
                                 size={markerSize}
                                 color="#32e482"
                             />
-                            <Callout tooltip={mapType === '1' ? false : true} style={mapType === '1' ? '' : styles.staticcustomcalloutgmaps}>
+                            <Callout tooltip={mapType === '1' ? false : true} style={mapType === '1' ? '' : styles.staticcustomcalloutgmaps }>
                                 <View style={mapType === '1' ? styles.staticcustomcalloutios : ''}>
                                     <Text style={{ fontSize: 16, color: colors.text, fontWeight: '500' }}>Estación de tranvía</Text>
                                     <Text style={{ fontSize: 12, color: colors.text }}>{station.name}</Text>

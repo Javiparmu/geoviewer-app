@@ -1,18 +1,21 @@
 import { Icon, Slider } from 'react-native-elements'
 import { View } from 'react-native'
 import { getColors } from '../helpers'
+import { useDispatch, useSelector } from 'react-redux'
+import { setSliderValue } from '../store/geoviewer/sideMenuSlice'
 
-export const SliderSettings = ({ maxValue, value, setValue, sliderPos }) => {
+export const SliderSettings = ({ maxValue, sliderPos }) => {
+
+  const dispatch = useDispatch()
+  const { sliderValues } = useSelector(state => state.sideMenu) 
+
   const colors = getColors()
+
   return (
     <>
       <Slider
-        value={value[sliderPos]}
-        onValueChange={(value) => setValue((prev) => {
-          const newValue = [...prev]
-          newValue[sliderPos] = value
-          return newValue
-        })}
+        value={sliderValues[sliderPos]}
+        onValueChange={(value) => dispatch(setSliderValue({ index: sliderPos, value }))}
         animateTransitions
         maximumValue={maxValue}
         minimumValue={0}

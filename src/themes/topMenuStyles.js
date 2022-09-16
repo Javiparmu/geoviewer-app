@@ -1,7 +1,8 @@
-import { Dimensions } from "react-native"
+import { Dimensions, StyleSheet } from "react-native"
 
-export const useTopMenuStyles = (colors, isVisible) => {
-    return {
+export const topMenuStyles = (colors, isVisible) => {
+
+    return StyleSheet.create({
         topmenu: {
             backgroundColor: colors.card,
             flexDirection: 'row-reverse',
@@ -42,5 +43,5 @@ export const useTopMenuStyles = (colors, isVisible) => {
             borderRadius: 10,
             borderColor: colors.text,
         }
-    }
+    })
 }

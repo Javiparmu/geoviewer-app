@@ -1,7 +1,7 @@
-import { Dimensions } from "react-native"
+import { Dimensions, StyleSheet } from "react-native"
 
-export const useBottomInfoStyles = (colors, isVisible, showRoute) => {
-    return {
+export const bottomInfoStyles = (colors, isVisible, showRoute) => {
+    return StyleSheet.create({
         infovisible: {
             backgroundColor: colors.card,
             width: '100%',
@@ -56,5 +56,5 @@ export const useBottomInfoStyles = (colors, isVisible, showRoute) => {
             shadowOpacity: 0.1,
             shadowRadius: 2,
         }
-    }
+    })
 }

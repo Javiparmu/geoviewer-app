@@ -1,7 +1,8 @@
-import { PixelRatio } from "react-native"
+import { PixelRatio, StyleSheet } from "react-native"
 
-export const useMakersStyles = (colors) => {
-    return {
+export const markersStyles = (colors) => {
+
+    return StyleSheet.create({
         customcalloutgmaps: {
             width: Platform.OS === 'ios' ? PixelRatio.get() * 80 : PixelRatio.get() * 90,
             height: 65,
@@ -39,5 +40,5 @@ export const useMakersStyles = (colors) => {
             margin: -30,
             padding: 30
         },
-    }
+    })
 }

@@ -1,9 +1,9 @@
-import { ActivityIndicator, StyleSheet, Text, View, Dimensions, TouchableOpacity, LayoutAnimation, NativeModules } from 'react-native'
+import { ActivityIndicator, Text, View, Dimensions, TouchableOpacity } from 'react-native'
 import { useEffect, useState } from 'react'
 import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons'
 import { Button, ButtonGroup, Divider } from 'react-native-elements'
 import { BottomInfoAnimations } from '../resources'
-import { useBottomInfoStyles } from '../hooks/stylehooks/useBottomInfoStyles'
+import { bottomInfoStyles } from '../themes'
 import { getArrivalTime, getColors, getRightTime } from '../helpers'
 
 const iconSize = 30
@@ -39,8 +39,7 @@ export const BottomInfo = ({
     }, [isVisible, showRoute, closed])
 
     const colors = getColors()
-    const bottomStyles = useBottomInfoStyles(colors, isVisible, showRoute)
-    const styles = StyleSheet.create(bottomStyles)
+    const styles = bottomInfoStyles(colors, isVisible, showRoute)
 
     const carComponent = () => <FontAwesome5 name="car-alt" size={24} color={selectedIndex === 0 ? colors.text : '#999999'} />
     const walkComponent = () => <FontAwesome5 name="walking" size={iconSize - 5} color={selectedIndex === 1 ? colors.text : '#999999'} />

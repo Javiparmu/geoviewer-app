@@ -1,7 +1,6 @@
 import MapViewDirections from 'react-native-maps-directions'
 import { GOOGLE_MAPS_APIKEY } from '@env'
 import { getColors } from '../helpers'
-import { useTheme } from '@react-navigation/native'
 
 export const MapDirections = ({ location, showRoute, setPathToStationData, selectedMarker, selectedTravelMode }) => {
     const colors = getColors()
